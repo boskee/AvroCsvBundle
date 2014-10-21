@@ -1,9 +1,15 @@
-{% extends 'AvroCsvBundle::layout.html.twig' %}
-{% block content %}
-    <div class="page-header">
-        <h1>Import {{ alias | title }}s</h1>
-    </div>
-    <form class="form-horizontal" action="{{ path('avro_csv_import_mapping', {'alias': alias}) }}" method="post" {{ form_enctype(form) }}>
+{% extends '::base.html.twig' %}
+
+
+{% block page_title %}
+    {{ 'import.title.upload'|trans }}
+{% endblock %}
+
+
+{% block page_content %}
+    <form class="form-horizontal"
+          action="{{ path('avro_csv_import_mapping', {'alias': alias}) }}"
+          method="post" {{ form_enctype(form) }}>
         <div id="error-container"></div>
         <div class="form-content">
             {{ form_row(form.delimiter) }}
@@ -11,8 +17,11 @@
             {{ form_row(form.filename) }}
             {{ form_widget(form._token) }}
         </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary"><i class="icon-arrow-right icon-white"></i> Next</button>
+        <div class="col-xs-12 text-right">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa fa-chevron-circle-down"></i>
+                {{ 'import.button.next'|trans }}
+            </button>
         </div>
     </form>
 {% endblock %}

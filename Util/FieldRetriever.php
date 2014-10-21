@@ -43,6 +43,7 @@ class FieldRetriever
         $properties = $reflectionClass->getProperties();
 
         $fields = array();
+        $translationKey = array();
         foreach ($properties as $property) {
             $addField = true;
             foreach ($this->annotationReader->getPropertyAnnotations($property) as $annotation) {
@@ -52,12 +53,14 @@ class FieldRetriever
             }
 
             if ($addField) {
-                $fields[] = $this->caseConverter->convert($property->getName(), $format);
+                $field = $this->caseConverter->convert($property->getName(), $format);
+                $fields[] = $field;
+                $translationKey[] = sprintf('import.field.%s', strtolower($field));
             }
         }
 
         if ($copyToKey) {
-            $fields = array_combine($fields, $fields);
+            $fields = array_combine($fields, $translationKey);
         }
 
         return $fields;
