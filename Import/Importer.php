@@ -28,23 +28,32 @@ class Importer
     protected $reader;
     protected $batchSize = 20;
     protected $importCount = 0;
+    protected $errorCount = 0;
     protected $caseConverter;
     protected $objectManager;
+    protected $validator;
 
     /**
-     * @param CsvReader     $reader        The csv reader
-     * @param Dispatcher    $dispatcher    The event dispatcher
+     * @param Reader     $reader        The csv reader
+     * @param EventDispatcherInterface    $dispatcher    The event dispatcher
      * @param CaseConverter $caseConverter The case Converter
      * @param ObjectManager $objectManager The Doctrine Object Manager
      * @param int           $batchSize     The batch size before flushing & clearing the om
      */
-    public function __construct(Reader $reader, EventDispatcherInterface $dispatcher, CaseConverter $caseConverter, ObjectManager $objectManager, $batchSize)
-    {
+    public function __construct(
+        Reader $reader,
+        EventDispatcherInterface $dispatcher,
+        CaseConverter $caseConverter,
+        ObjectManager $objectManager,
+        $validator,
+        $batchSize
+    ) {
         $this->reader = $reader;
         $this->dispatcher = $dispatcher;
         $this->caseConverter = $caseConverter;
         $this->objectManager = $objectManager;
         $this->batchSize = $batchSize;
+        $this->validator = $validator;
     }
 
     /**
@@ -82,7 +91,6 @@ class Importer
             } else {
                 $this->addRow($row, $fields, false);
             }
-            $this->importCount++;
         }
 
         // one last flush to make sure no persisted objects get left behind
@@ -158,11 +166,17 @@ class Importer
 
         $this->dispatcher->dispatch('avro_csv.row_added', new RowAddedEvent($entity, $row, $fields));
 
-        $this->objectManager->persist($entity);
+        if (0 < count($errors = $this->validator->validate($entity))) {
+            $this->errorCount++;
+        } else {
+            $this->objectManager->persist($entity);
 
-        if ($andFlush) {
-            $this->objectManager->flush();
-            $this->objectManager->clear($this->class);
+            if ($andFlush) {
+                $this->objectManager->flush();
+                $this->objectManager->clear($this->class);
+            }
+
+            $this->importCount++;
         }
     }
 
@@ -174,5 +188,13 @@ class Importer
     public function getImportCount()
     {
         return $this->importCount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getErrorCount()
+    {
+        return $this->errorCount;
     }
 }

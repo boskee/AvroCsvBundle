@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * CSV Import Form Type
@@ -14,6 +15,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class ImportFormType extends AbstractType
 {
+    private $fileConstraints = array();
+
+    public function __construct($removeConstrants = false)
+    {
+        if (!$removeConstrants) {
+            $this->fileConstraints[] = new NotBlank();
+        }
+    }
+
     /**
      * Build form
      *
@@ -24,16 +34,18 @@ class ImportFormType extends AbstractType
     {
         $builder
             ->add('delimiter', 'choice', array(
-                'label' => 'Delimiter',
+                'label' => 'import.form.delimiter',
+                'constraints' => $this->fileConstraints,
                 'choices' => array(
-                    ',' => 'comma',
-                    ';' => 'semicolon',
-                    '|' => 'pipe',
-                    ':' => 'colon'
+                    ',' => 'import.delimiter.comma',
+                    ';' => 'import.delimiter.semicolon',
+                    '|' => 'import.delimiter.pipe',
+                    ':' => 'import.delimiter.colon'
                 )
             ))
             ->add('file', 'file', array(
-                'label' => 'File',
+                'label' => 'import.form.file',
+                'constraints' => $this->fileConstraints,
                 'required' => true,
             ))
             ->add('filename', 'hidden', array(
@@ -52,7 +64,7 @@ class ImportFormType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_BIND, function (FormEvent $event) {
             $data = $event->getData();
 
-            if (!$data || !array_key_exists('file', $data)) {
+            if (!$data || !isset($data['file'])) {
                 return;
             }
 

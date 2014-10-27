@@ -1,70 +1,60 @@
-{% extends 'AvroCsvBundle::layout.html.twig' %}
-{% block content %}
-    <div class="page-header">
-        <h1>Map Columns</h1>
-    </div>
-    <form class="form-horizontal" action="{{ path('avro_csv_import_process', {'alias': alias}) }}" method="post" {{ form_enctype(form) }}>
-        <div id="error-container"></div>
-        <div class="form-content">
-            <table class="table-styled table-bordered table-striped table-rounded">
-                <thead>
-                    <tr>
-                        <th>Your Column Headings</th>
-                        <th>Field Mapping</th>
-                        {% for row in rows %}
-                            <th>Sample {{ loop.index }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody class="collection">
-                    {% set fieldChoice = form_widget(form.fields.vars['prototype']) %}
-                    {% for header in headers %}
-                        {% set index = loop.index0 %}
-                        <tr class="collection-item">
-                            <td>{{ header }}</td>
-                            <td>{{ fieldChoice | raw }}</td>
-                            {% for row in rows %}
-                                <td>{{ row[index] }}</td>
+{% extends '::base.html.twig' %}
+
+{% block page_title %}
+    {{ 'import.title.mapping'|trans }}
+{% endblock %}
+
+{% block page_content %}
+    <form id="import-import.mapping"
+          class="form-horizontal"
+          action="{{ path('avro_csv_import_process', {'alias': alias}) }}"
+          method="post" {{ form_enctype(form) }}>
+
+        <div class="col-xs-12" id="beneficiary">
+            <div class="box">
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{ 'import.mapping.header'|trans }}</th>
+                                <th>{{ 'import.mapping.field'|trans }}</th>
+                                {% for row in rows %}
+                                    <th>{{ 'import.mapping.sample'|trans }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="collection">
+                            {% set fieldChoice = form_widget(form.fields.vars['prototype']) %}
+                            {% for header in headers %}
+                                {% set index = loop.index0 %}
+                                <tr class="collection-item">
+                                    <td>{{ header }}</td>
+                                    <td>{{ fieldChoice | replace({'__name__': index}) | raw }}</td>
+                                    {% for row in rows %}
+                                        <td>{{ row[index] }}</td>
+                                    {% endfor %}
+                                </tr>
                             {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div class="hide">
-                {{ form_row(form.delimiter) }}
-                {{ form_row(form.filename) }}
-            </div>
-            <table class="table-styled table-bordered table-striped table-rounded">
-            {{ form_widget(form._token) }}
+                        </tbody>
+                    </table>
+                    <div class="hide">
+                        {{ form_row(form.delimiter) }}
+                        {{ form_row(form.filename) }}
+                    </div>
+                    {{ form_widget(form._token) }}
+                </div><!-- /.box-body -->
+            </div><!-- /.box -->
         </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-large btn-primary"><i class="icon-ok icon-white"></i> Import CSV</button>
-            <a href="{{ path('avro_csv_import_upload', {'alias': alias}) }}" class="btn"><i class="icon-arrow-left"></i> Back</a>
+
+        <div class="col-xs-12 text-right">
+            <button type="submit" class="btn btn-large btn-primary">
+                <i class="fa fa-check-square"></i>
+                {{ 'import.button.process_import'|trans }}
+            </button>
+            <a href="{{ path('avro_csv_import_upload', {'alias': alias}) }}" class="btn">
+                <i class="fa fa-chevron-circle-down"></i>
+                {{ 'import.button.back'|trans }}
+            </a>
         </div>
     </form>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            var headers = {{ headersJson | raw }};
-            var fieldSelectors = $('form .collection').find('select');
-            $.each(headers, function(k, v) {
-                $(fieldSelectors[k]).find('option[value="' + v + '"]').attr('selected', 'selected');
-            });
-
-            $('form').submit(function() {
-                // rename collection items
-                $(this).find('.collection').each(function() {
-                    var itemIndex = 0;
-                    $(this).find('.collection-item').each(function() {
-                        $(this).find('input, select, textarea').each(function() {
-                            if ($(this).attr('id') && $(this).attr('name')) {
-                                $(this).attr('id', $(this).attr('id').replace(/__name__/g, itemIndex));
-                                $(this).attr('name', $(this).attr('name').replace(/__name__/g, itemIndex));
-                            }
-                        });
-                        itemIndex++;
-                    });
-                });
-            })
-        });
-    </script>
 {% endblock %}

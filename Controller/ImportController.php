@@ -29,9 +29,11 @@ class ImportController extends ContainerAware
      */
     public function uploadAction($alias)
     {
-        $fieldChoices = $this->container->get('avro_csv.field_retriever')->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
+        $fieldChoices = $this->container->get('avro_csv.field_retriever')
+            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
 
-        $form = $this->container->get('form.factory')->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
+        $form = $this->container->get('form.factory')
+            ->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
 
         return $this->container->get('templating')->renderResponse('AvroCsvBundle:Import:upload.html.twig', array(
             'form' => $form->createView(),
@@ -49,7 +51,8 @@ class ImportController extends ContainerAware
      */
     public function mappingAction(Request $request, $alias)
     {
-        $fieldChoices = $this->container->get('avro_csv.field_retriever')->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
+        $fieldChoices = $this->container->get('avro_csv.field_retriever')
+            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
 
         $form = $this->container->get('form.factory')->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
 
@@ -71,16 +74,27 @@ class ImportController extends ContainerAware
 
                 $rows = $reader->getRows($this->container->getParameter('avro_csv.sample_count'));
 
-                return $this->container->get('templating')->renderResponse('AvroCsvBundle:Import:mapping.html.twig', array(
+                return $this->container
+                    ->get('templating')
+                    ->renderResponse('AvroCsvBundle:Import:mapping.html.twig', array(
                     'form' => $form->createView(),
                     'alias' => $alias,
                     'headers' => $headers,
                     'headersJson' => json_encode($headers, JSON_FORCE_OBJECT),
                     'rows' => $rows
                 ));
+            } else {
+                return $this->container->get('templating')->renderResponse('AvroCsvBundle:Import:upload.html.twig', array(
+                    'form' => $form->createView(),
+                    'alias' => $alias
+                ));
             }
         } else {
-            return new RedirectResponse($this->container->get('router')->generate($this->container->getParameter(sprintf('avro_csv.objects.%s.redirect_route', $alias))));
+            return new RedirectResponse(
+                $this->container->get('router')->generate(
+                    $this->container->getParameter(sprintf('avro_csv.objects.%s.redirect_route', $alias))
+                )
+            );
         }
     }
 
@@ -94,9 +108,12 @@ class ImportController extends ContainerAware
      */
     public function processAction(Request $request, $alias)
     {
-        $fieldChoices = $this->container->get('avro_csv.field_retriever')->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
+        $fieldChoices = $this->container->get('avro_csv.field_retriever')
+            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
 
-        $form = $this->container->get('form.factory')->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
+        $form = $this->container
+            ->get('form.factory')
+            ->create(new ImportFormType(true), null, array('field_choices' => $fieldChoices));
 
         if ('POST' == $request->getMethod()) {
             $form->bind($request);
@@ -116,13 +133,33 @@ class ImportController extends ContainerAware
 
                 $importer->import($form['fields']->getData());
 
-                $this->container->get('session')->getFlashBag()->set('success', $importer->getImportCount().' items imported.');
+                if (0 < $importer->getImportCount()) {
+                    $this->addFlashes('success', 'import.message.success', array('%importedRow%' => $importer->getImportCount()));
+                }
 
+                if (0 < $importer->getErrorCount()) {
+                    $this->addFlashes('danger', 'import.message.error', array('%erroredRow%' => $importer->getErrorCount()));
+                }
             } else {
-                $this->container->get('session')->getFlashBag()->set('error', 'Import failed. Please try again.');
+                $this->addFlashes('danger', 'import.message.fatal_error');
             }
         }
 
-        return new RedirectResponse($this->container->get('router')->generate($this->container->getParameter(sprintf('avro_csv.objects.%s.redirect_route', $alias))));
+        return new RedirectResponse(
+            $this->container->get('router')->generate(
+                $this->container->getParameter(sprintf('avro_csv.objects.%s.redirect_route', $alias))
+            )
+        );
+    }
+
+    private function addFlashes($type, $message, array $data = array())
+    {
+        $this->container
+            ->get('session')
+            ->getFlashBag()
+            ->set(
+                $type,
+                $this->container->get('translator')->trans($message, $data)
+            );
     }
 }
