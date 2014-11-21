@@ -1,60 +1,46 @@
-{% extends '::base.html.twig' %}
+{% extends "AvroCsvBundle::layout.html.twig" %}
 
-{% block page_title %}
-    {{ 'import.title.mapping'|trans }}
-{% endblock %}
+{% trans_default_domain 'AvroCsvBundle' %}
 
-{% block page_content %}
-    <form id="import-import.mapping"
-          class="form-horizontal"
-          action="{{ path('avro_csv_import_process', {'alias': alias}) }}"
-          method="post" {{ form_enctype(form) }}>
+{% block avro_csv_title %}{{ 'import.title.mapping'|trans }}{% endblock avro_csv_title %}
 
-        <div class="col-xs-12" id="beneficiary">
-            <div class="box">
-                <div class="box-body table-responsive no-padding">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>{{ 'import.mapping.header'|trans }}</th>
-                                <th>{{ 'import.mapping.field'|trans }}</th>
-                                {% for row in rows %}
-                                    <th>{{ 'import.mapping.sample'|trans }}</th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody class="collection">
-                            {% set fieldChoice = form_widget(form.fields.vars['prototype']) %}
-                            {% for header in headers %}
-                                {% set index = loop.index0 %}
-                                <tr class="collection-item">
-                                    <td>{{ header }}</td>
-                                    <td>{{ fieldChoice | replace({'__name__': index}) | raw }}</td>
-                                    {% for row in rows %}
-                                        <td>{{ row[index] }}</td>
-                                    {% endfor %}
-                                </tr>
+{% block avro_csv_content %}
+    <form action="{{ path('avro_csv_import_process', {'alias': alias}) }}" method="post" {{ form_enctype(form) }}>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>{{ 'import.mapping.header'|trans }}</th>
+                        <th>{{ 'import.mapping.field'|trans }}</th>
+                        {% for row in rows %}
+                            <th>{{ 'import.mapping.sample'|trans }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set fieldChoice = form_widget(form.fields.vars['prototype']) %}
+                    {% for header in headers %}
+                        {% set index = loop.index0 %}
+                        <tr>
+                            <td>{{ header }}</td>
+                            <td>{{ fieldChoice | replace({'__name__': index}) | raw }}</td>
+                            {% for row in rows %}
+                                <td>{{ row[index] }}</td>
                             {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="hide">
-                        {{ form_row(form.delimiter) }}
-                        {{ form_row(form.filename) }}
-                    </div>
-                    {{ form_widget(form._token) }}
-                </div><!-- /.box-body -->
-            </div><!-- /.box -->
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div style="display: none;">
+                {{ form_row(form.delimiter) }}
+                {{ form_row(form.filename) }}
+            </div>
+            {{ form_widget(form._token) }}
         </div>
 
-        <div class="col-xs-12 text-right">
-            <button type="submit" class="btn btn-large btn-primary">
-                <i class="fa fa-check-square"></i>
-                {{ 'import.button.process_import'|trans }}
-            </button>
-            <a href="{{ path('avro_csv_import_upload', {'alias': alias}) }}" class="btn">
-                <i class="fa fa-chevron-circle-down"></i>
-                {{ 'import.button.back'|trans }}
-            </a>
+        <div>
+            <input type="submit" value="{{ 'import.button.process_import'|trans }}" />
+            <a href="{{ path('avro_csv_import_upload', {'alias': alias}) }}">{{ 'import.button.back'|trans }}</a>
         </div>
     </form>
-{% endblock %}
+{% endblock avro_csv_content %}
