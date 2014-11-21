@@ -1,0 +1,29 @@
+import:
+    message:
+        success: %importedRow% lines were imported into database
+        error: "The import of %erroredRow% lines failed, Please check your association."
+        fatal_error: The import failed. Please try again.
+
+    button:
+        process_import: Import file
+        next: Next
+        back: Back
+
+    mapping:
+        header: Your Column Headings
+        field: Field Mapping
+        sample: Sample
+
+    title:
+        mapping: Link your fields
+        upload: Upload CSV file
+
+    delimiter:
+        comma: Comma
+        semicolon: Semicolon
+        pipe: Pipe
+        colon: Colon
+
+    form:
+        delimiter: Delimiter
+        file: File
