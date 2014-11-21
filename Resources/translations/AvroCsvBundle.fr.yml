@@ -1,7 +1,7 @@
 import:
     message:
         success: %importedRow% lignes ont été importées en base de données
-        error: L'import de %erroredRow% lignes a échoué, Veuillez vérifier votre association.
+        error: "L'import de %erroredRow% lignes a échoué, Veuillez vérifier votre association."
         fatal_error: L'import a échoué veuillez recommencer
 
     button:
@@ -14,10 +14,9 @@ import:
         field: Champs à associé
         sample: Exemple
 
-    import:
-        title:
-            mapping: Associer vos champs
-            upload: Envoi du fichier CSV
+    title:
+        mapping: Associer vos champs
+        upload: Envoi du fichier CSV
 
     delimiter:
         comma: Virgule

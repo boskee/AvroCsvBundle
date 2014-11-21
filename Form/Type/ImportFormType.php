@@ -41,12 +41,14 @@ class ImportFormType extends AbstractType
                     ';' => 'import.delimiter.semicolon',
                     '|' => 'import.delimiter.pipe',
                     ':' => 'import.delimiter.colon'
-                )
+                ),
+                'translation_domain' => 'AvroCsvBundle'
             ))
             ->add('file', 'file', array(
                 'label' => 'import.form.file',
                 'constraints' => $this->fileConstraints,
                 'required' => true,
+                'translation_domain' => 'AvroCsvBundle'
             ))
             ->add('filename', 'hidden', array(
                 'required' => false
