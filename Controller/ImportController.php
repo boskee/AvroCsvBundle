@@ -8,7 +8,6 @@
 namespace Avro\CsvBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Avro\CsvBundle\Form\Type\ImportFormType;
@@ -32,10 +31,9 @@ class ImportController extends Controller
         $fieldChoices = $this->container->get('avro_csv.field_retriever')
             ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), $alias, 'title', true);
 
-        $form = $this->container->get('form.factory')
-            ->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
+        $form  = $this->createForm(new ImportFormType(), null, array('field_choices' => $fieldChoices));
 
-        return $this->container->get('templating')->renderResponse('AvroCsvBundle:Import:upload.html.twig', array(
+        return $this->render('AvroCsvBundle:Import:upload.html.twig', array(
             'form' => $form->createView(),
             'alias' => $alias
         ));
@@ -54,7 +52,7 @@ class ImportController extends Controller
         $fieldChoices = $this->container->get('avro_csv.field_retriever')
             ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), $alias, 'title', true);
 
-        $form = $this->container->get('form.factory')->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
+        $form  = $this->createForm(new ImportFormType(), null, array('field_choices' => $fieldChoices));
 
         if ($request->isMethod('post'))
         {
@@ -112,11 +110,10 @@ class ImportController extends Controller
         $fieldChoices = $this->container->get('avro_csv.field_retriever')
             ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), $alias, 'title', true);
 
-        $form = $this->container
-            ->get('form.factory')
-            ->create(new ImportFormType(true), null, array('field_choices' => $fieldChoices));
+        $form  = $this->createForm(new ImportFormType(true), null, array('field_choices' => $fieldChoices));
 
-        if ('POST' == $request->getMethod()) {
+        if ($request->isMethod('post'))
+        {
             $form->bind($request);
 
             if ($form->isValid()) {
@@ -146,11 +143,7 @@ class ImportController extends Controller
             }
         }
 
-        return new RedirectResponse(
-            $this->container->get('router')->generate(
-                $this->container->getParameter(sprintf('avro_csv.objects.%s.redirect_route', $alias))
-            )
-        );
+        return $this->redirect($this->generateUrl($this->container->getParameter(sprintf('avro_csv.objects.%s.redirect_route', $alias))));
     }
 
     private function addFlashes($type, $message, array $data = array())
