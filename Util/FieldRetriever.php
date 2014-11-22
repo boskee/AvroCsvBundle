@@ -45,6 +45,9 @@ class FieldRetriever
 
         $fields = array();
         $translationKey = array();
+        $fields[] = '';
+        $translationKey[] = 'import.field.skip';
+
         foreach ($properties as $property) {
             $addField = true;
             foreach ($this->annotationReader->getPropertyAnnotations($property) as $annotation) {

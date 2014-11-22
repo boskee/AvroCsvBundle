@@ -58,7 +58,8 @@ class ImportFormType extends AbstractType
                 'required' => false,
                 'type' => 'choice',
                 'options' => array(
-                    'choices' => $options['field_choices']
+                    'choices' => $options['field_choices'],
+                    'required' => false
                 ),
                 'allow_add' => true
             ));
