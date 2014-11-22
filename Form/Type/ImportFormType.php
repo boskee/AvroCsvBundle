@@ -61,7 +61,8 @@ class ImportFormType extends AbstractType
                     'choices' => $options['field_choices'],
                     'required' => false
                 ),
-                'allow_add' => true
+                'allow_add' => true,
+                'translation_domain' => 'AvroCsvBundle'
             ));
 
         $builder->addEventListener(FormEvents::PRE_BIND, function (FormEvent $event) {

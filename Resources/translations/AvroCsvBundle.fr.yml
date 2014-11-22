@@ -27,3 +27,6 @@ import:
     form:
         delimiter: Délimiteur
         file: Fichier
+
+    field:
+        skip: Passer

@@ -9,7 +9,7 @@ namespace Avro\CsvBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Avro\CsvBundle\Form\Type\ImportFormType;
 
@@ -18,7 +18,7 @@ use Avro\CsvBundle\Form\Type\ImportFormType;
  *
  * @author Joris de Wit <joris.w.dewit@gmail.com>
  */
-class ImportController extends ContainerAware
+class ImportController extends Controller
 {
     /**
      * Upload a csv.
@@ -56,7 +56,8 @@ class ImportController extends ContainerAware
 
         $form = $this->container->get('form.factory')->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
 
-        if ('POST' == $request->getMethod()) {
+        if ($request->isMethod('post'))
+        {
             $form->bind($request);
             if ($form->isValid()) {
                 $reader = $this->container->get('avro_csv.reader');
@@ -74,9 +75,7 @@ class ImportController extends ContainerAware
 
                 $rows = $reader->getRows($this->container->getParameter('avro_csv.sample_count'));
 
-                return $this->container
-                    ->get('templating')
-                    ->renderResponse('AvroCsvBundle:Import:mapping.html.twig', array(
+                return $this->render('AvroCsvBundle:Import:mapping.html.twig', array(
                     'form' => $form->createView(),
                     'alias' => $alias,
                     'headers' => $headers,
@@ -84,14 +83,16 @@ class ImportController extends ContainerAware
                     'rows' => $rows
                 ));
             } else {
-                return $this->container->get('templating')->renderResponse('AvroCsvBundle:Import:upload.html.twig', array(
+                return $this->render('AvroCsvBundle:Import:upload.html.twig', array(
                     'form' => $form->createView(),
                     'alias' => $alias
                 ));
             }
-        } else {
-            return new RedirectResponse(
-                $this->container->get('router')->generate(
+        }
+        else
+        {
+            return $this->redirect(
+                $this->generateUrl(
                     $this->container->getParameter(sprintf('avro_csv.objects.%s.redirect_route', $alias))
                 )
             );
