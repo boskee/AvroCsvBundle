@@ -78,7 +78,6 @@ class ImportController extends Controller
                     'form' => $form->createView(),
                     'alias' => $alias,
                     'headers' => $headers,
-                    'headersJson' => json_encode($headers, JSON_FORCE_OBJECT),
                     'rows' => $rows
                 ));
             }
