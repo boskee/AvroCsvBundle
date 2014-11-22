@@ -56,8 +56,9 @@ class ImportController extends Controller
 
         if ($request->isMethod('post'))
         {
-            $form->bind($request);
-            if ($form->isValid()) {
+            $form->handleRequest($request);
+            if ($form->isValid())
+            {
                 $reader = $this->container->get('avro_csv.reader');
 
                 $file = $form['file']->getData();
@@ -80,7 +81,9 @@ class ImportController extends Controller
                     'headersJson' => json_encode($headers, JSON_FORCE_OBJECT),
                     'rows' => $rows
                 ));
-            } else {
+            }
+            else
+            {
                 return $this->render('AvroCsvBundle:Import:upload.html.twig', array(
                     'form' => $form->createView(),
                     'alias' => $alias
@@ -114,9 +117,10 @@ class ImportController extends Controller
 
         if ($request->isMethod('post'))
         {
-            $form->bind($request);
+            $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isValid())
+            {
                 $importer = $this->container->get('avro_csv.importer');
 
                 $importer->init(
@@ -138,9 +142,18 @@ class ImportController extends Controller
                 if (0 < $importer->getErrorCount()) {
                     $this->addFlashes('danger', 'import.message.error', array('%erroredRow%' => $importer->getErrorCount()));
                 }
-            } else {
+            }
+            else
+            {
                 $this->addFlashes('danger', 'import.message.fatal_error');
             }
+        }
+        else
+        {
+            return $this->forward('AvroCsvBundle:Import:mapping', array(
+                'request' => $request,
+                'alias' => $alias
+            ));
         }
 
         return $this->redirect($this->generateUrl($this->container->getParameter(sprintf('avro_csv.objects.%s.redirect_route', $alias))));
