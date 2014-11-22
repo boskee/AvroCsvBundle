@@ -30,7 +30,7 @@ class ImportController extends ContainerAware
     public function uploadAction($alias)
     {
         $fieldChoices = $this->container->get('avro_csv.field_retriever')
-            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
+            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), $alias, 'title', true);
 
         $form = $this->container->get('form.factory')
             ->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
@@ -52,7 +52,7 @@ class ImportController extends ContainerAware
     public function mappingAction(Request $request, $alias)
     {
         $fieldChoices = $this->container->get('avro_csv.field_retriever')
-            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
+            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), $alias, 'title', true);
 
         $form = $this->container->get('form.factory')->create(new ImportFormType(), null, array('field_choices' => $fieldChoices));
 
@@ -109,7 +109,7 @@ class ImportController extends ContainerAware
     public function processAction(Request $request, $alias)
     {
         $fieldChoices = $this->container->get('avro_csv.field_retriever')
-            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), 'title', true);
+            ->getFields($this->container->getParameter(sprintf('avro_csv.objects.%s.class', $alias)), $alias, 'title', true);
 
         $form = $this->container
             ->get('form.factory')

@@ -44,7 +44,7 @@ class Reader
      */
     public function getRow()
     {
-        if (($row = fgetcsv($this->handle, 1000, $this->delimiter, $this->enclosure)) !== false) {
+        if (($row = fgetcsv($this->handle, 0, $this->delimiter, $this->enclosure)) !== false) {
             $this->line++;
 
             return $row;

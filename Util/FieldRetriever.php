@@ -32,12 +32,13 @@ class FieldRetriever
      * Get the entity/documents field names
      *
      * @param string  $class     The class name
+     * @param string  $alias     The alias
      * @param string  $format    The desired field case format
      * @param boolean $copyToKey Copy the field values to their respective key
      *
      * @return array $fields
      */
-    public function getFields($class, $format = 'title', $copyToKey = false)
+    public function getFields($class, $alias, $format = 'title', $copyToKey = false)
     {
         $reflectionClass = new \ReflectionClass($class);
         $properties = $reflectionClass->getProperties();
@@ -55,7 +56,7 @@ class FieldRetriever
             if ($addField) {
                 $field = $this->caseConverter->convert($property->getName(), $format);
                 $fields[] = $field;
-                $translationKey[] = sprintf('import.field.%s', strtolower($field));
+                $translationKey[] = sprintf('import.field.%s.%s', $alias, strtolower($field));
             }
         }
 
